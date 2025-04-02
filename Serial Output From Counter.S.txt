@@ -1,3 +1,12 @@
+; Code needed to run on Aduino IDE
+#define __SFR_OFFSET 0x00
+#include "avr/io.h"
+
+; Add .global for any function called from Arduino
+.global start
+.global BEGIN
+
+
 ;
 ; Counter_Serialized_Output.asm
 ;
@@ -6,9 +15,8 @@
 ;
 
 
-; This code write to a 7-segment display. Codes for the 7-segment display
-; are stored in a table in program memory
-start:
+; This code serialized the output of a software counter and sends the bit stream out through Bit 1 on PORT F
+
 .MACRO	PULSE
 	CBI @0, @1
 	NOP
@@ -17,17 +25,18 @@ start:
 	CBI	@0, @1
 .ENDMACRO
 	
-;--- Program Start
+;--- Program Start (start called from setup() in .ino)
+
 .ORG	$0000
+start:
 		SBI DDRF, 1		;SER   (A1)
 		SBI DDRF, 2		;SRCLK (A2)
 		SBI DDRF, 3		;RCLK  (A3)
+		RET
 
-BEGIN:	LDI R20, 5
-LOOP:	MOV R17,R20		;Put count in R17
-		CALL DIGIT     		; Use with 7-segment display
+BEGIN:	LDI R20, 0
+LOOP:	
 		CALL SERIAL_OUT
-		MOV R20,R17		;Move count back into R20
 		INC R20
 		RCALL DELAY
 		CPI R20, 10		;compare R20 with 10
@@ -48,18 +57,6 @@ DL3:	NOP
 		BRNE DL1
 		RET
 
-;--- DIGIT subroutine
-DIGIT:	LDI R21, 0
-		LDI ZH,HIGH(TABLE<<1)	
-		LDI ZL,LOW(TABLE<<1)
-CMP:	CPSE R17,R21
-		RJMP UPD
-		LPM	R20,Z
-		RET
-UPD:	INC R21
-		INC ZL
-		RJMP CMP
-
 ;--- SERIAL_OUT subroutine
 SERIAL_OUT:
 	CLC
@@ -71,20 +68,16 @@ AGAIN:
 	ROR R20
 	BRCS ONE
 	CBI PORTF,1
-	PULSE PORTF, 3
+	PULSE PORTF, 2
 	JMP	NEXT
 ONE:	SBI PORTF,1
-	PULSE PORTF, 3
+	PULSE PORTF, 2
 NEXT:
 	DEC R16
 	BRNE AGAIN
 	ROR R20
 	SBI PORTF,1
-	PULSE PORTF, 2
+	PULSE PORTF, 3
 	RET
-
-;--- 7-Segment Display Table
-;.ORG $500
-TABLE: .DB 0x03, 0x9F, 0x25, 0x0C, 0x99, 0x49, 0x41, 0x1B, 0x01, 0x19
 
 		

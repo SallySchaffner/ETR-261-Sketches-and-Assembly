@@ -130,7 +130,8 @@
     <ClCompile Include="ETR 261 Sketches and Assembly.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Drive_7-Segment_Display.txt" />
+    <Text Include="Serial Output From Counter.ino.txt" />
+    <Text Include="Serial Output From Counter.S.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

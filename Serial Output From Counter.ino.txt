@@ -1,0 +1,15 @@
+extern "C" // function prototypes external to C sketch
+{
+  void start();
+  void BEGIN();
+}
+
+void setup() 
+{
+  start();
+}
+
+void loop() 
+{
+  BEGIN();
+}
